@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stat Holiday Pay — Decision Flow</title>
+  <style>
+    :root {
+      --navy: #0f172a;
+      --blue: #2563eb;
+      --blue-bg: #eff6ff;
+      --purple: #7c3aed;
+      --purple-bg: #f5f3ff;
+      --green: #326344;
+      --green-bg: #f0fdf4;
+      --green-strong: #dcfce7;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --orange: #ea580c;
+      --orange-bg: #fff7ed;
+      --yellow: #ca8a04;
+      --yellow-bg: #fefce8;
+      --gray-text: #475569;
+      --border: #e2e8f0;
+      --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* Layout Components */
+    .header {
+      background: var(--navy);
+      color: #fff;
+      padding: 40px 32px;
+      text-align: center;
+      border-bottom: 4px solid var(--blue);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 8px;
+    }
+
+    .header .sub {
+      font-size: 14px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .content {
+      max-width: 1400px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    .view {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Information Panels */
+    .ref-panels {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .ref-panel {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .ref-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ref-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .def-item {
+      font-size: 14px;
+      margin-bottom: 16px;
+      padding-left: 12px;
+      border-left: 3px solid var(--border);
+    }
+
+    .def-label {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .leave-col-title {
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-text);
+    }
+
+    .leave-item {
+      font-size: 13px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tier-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* Flowchart Node Styling */
+    .flow-canvas {
+      position: relative;
+      overflow: auto;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 40px;
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .flow-inner {
+      position: relative;
+    }
+
+    .fnode {
+      position: absolute;
+      border-radius: 12px;
+      padding: 20px 24px;
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.5;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.2s;
+      z-index: 10;
+    }
+
+    .fnode strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .fnode small {
+      font-size: 12px;
+      opacity: 0.9;
+      display: block;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .fnode.n-start { background: var(--navy); color: #fff; border: none; }
+    .fnode.n-step { background: #f8fafc; border: 2px solid var(--navy); color: var(--navy); }
+    .fnode.n-dec { background: var(--yellow-bg); border: 2px solid var(--yellow); font-weight: 600; }
+    .fnode.n-blue { background: var(--blue-bg); border: 2px solid var(--blue); color: var(--blue); font-weight: 700; }
+    .fnode.n-purple { background: var(--purple-bg); border: 2px solid var(--purple); color: var(--purple); font-weight: 700; }
+    .fnode.n-green { background: var(--green-bg); border: 2px solid var(--green); }
+    .fnode.n-green-r { background: var(--green-strong); border: 2px solid var(--green); font-weight: 600; }
+    .fnode.n-red { background: var(--red-bg); border: 2px solid var(--red); }
+    .fnode.n-red-r { background: var(--red-bg); border: 2px solid var(--red); font-weight: 700; color: var(--red); }
+    .fnode.n-orange { background: var(--orange-bg); border: 2px solid var(--orange); }
+    .fnode.n-orange-r { background: var(--orange-bg); border: 2px solid var(--orange); font-weight: 700; color: var(--orange); }
+
+    .flow-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .flow-svg line { stroke-width: 2.5; }
+    .flow-svg text { font-size: 12px; font-weight: 700; }
+
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      background: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      justify-content: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-text);
+    }
+
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    @media print {
+      .flow-canvas { border: none; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Stat Holiday Pay — Decision Flow</h1>
+  <div class="sub">Implementation Business Rules | Bee-Clean / Findd | Feb 18, 2026</div>
+</div>
+
+<div class="content">
+
+  <div class="view" id="view-overview">
+    <div class="ref-panels">
+      <div class="ref-panel">
+        <div class="ref-title">Core Definitions</div>
+        <div class="def-item">
+          <span class="def-label" style="color:var(--green)">Tier 1 (Reversible Leave)</span>
+          Standard paid leaves (Vacation, Sick, Personal, Wellness) that are <strong>removed</strong> from the stat date. The hours are credited back to the accrual balance. Employee receives Stat Pay instead of Leave Pay.
+        </div>
+        <div class="def-item">
+          <span class="def-label" style="color:var(--red)">Tier 2 (Non-Reversible Leave)</span>
+          Circumstantial leaves (Bereavement, Jury Duty) where the deduction <strong>remains</strong>. These are treated as "elected days off" and do not trigger Stat Pay if they overlap a holiday.
+        </div>
+        <div class="def-item">
+          <span class="def-label" style="color:var(--gray-text)">Unpaid Leave</span>
+          Specifically defined as <strong>Unpaid Sick</strong> and <strong>Unpaid Leave</strong>. Employee is not paid for leave, does not receive stat, and the request remains deducted from balance.
+        </div>
+        <div class="def-item">
+          <span class="def-label" style="color:var(--orange)">Stat Pay Suppression</span>
+          Stat pay is not generated. Employee keeps leave deduction and is paid from their accrual balance at regular rate. Used to prevent double-pay at Open Sites.
+        </div>
+        <div class="def-item">
+          <span class="def-label" style="color:var(--navy)">Note on Wellness Leave</span>
+          Wellness follows Tier 1 path at <strong>closed</strong> sites but is <strong>suppressed</strong> at open sites (primarily YVR), following the same logic as sick/personal.
+        </div>
+      </div>
+
+      <div class="ref-panel">
+        <div class="ref-title">Leave Logic Key</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div>
+            <div class="leave-col-title" style="color:var(--green)">Tier 1: Reversible</div>
+            <div class="leave-item"><div class="tier-dot" style="background:var(--green-strong); border:1px solid var(--green)"></div> <strong>Vacation</strong> (Always)</div>
+            <div class="leave-item"><div class="tier-dot" style="background:var(--green-strong); border:1px solid var(--green)"></div> <strong>Sick</strong> (Closed Only)</div>
+            <div class="leave-item"><div class="tier-dot" style="background:var(--green-strong); border:1px solid var(--green)"></div> <strong>Personal</strong> (Closed Only)</div>
+          </div>
+          <div>
+            <div class="leave-col-title" style="color:var(--red)">Tier 2: Non-Reversible</div>
+            <div class="leave-item"><div class="tier-dot" style="background:var(--red-bg); border:1px solid var(--red)"></div> Bereavement</div>
+            <div class="leave-item"><div class="tier-dot" style="background:var(--red-bg); border:1px solid var(--red)"></div> Jury Duty</div>
+            <div class="leave-item"><div class="tier-dot" style="background:#f1f5f9; border:1px solid #94a3b8"></div> <strong>Unpaid Sick</strong></div>
+            <div class="leave-item"><div class="tier-dot" style="background:#f1f5f9; border:1px solid #94a3b8"></div> <strong>Unpaid Leave</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--blue-bg);border-color:var(--blue)"></div> Closed Site</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--purple-bg);border-color:var(--purple)"></div> Open Site</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--green-bg);border-color:var(--green)"></div> Reversed / Paid Stat</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--red-bg);border-color:var(--red)"></div> No Stat Pay</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--orange-bg);border-color:var(--orange)"></div> Stat Suppressed</div>
+    </div>
+
+    <div class="flow-canvas">
+      <div class="flow-inner" id="flowInner"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // FLOW DIAGRAM ENGINE
+  (function() {
+    const PAD = 80; 
+    const HGAP = 50;
+    
+    const tree = {
+      id:'start', cls:'n-start', html:'<strong>Trigger</strong>Unionized Employees within the Findd System', w:400, children:[
+        {id:'step0', cls:'n-step', html:'<strong>Step 0: Context Lookup</strong>Any OPEN sites will be managed within the Master Google Sheet<br><small>Default to "Closed" if not found</small>', w:420, children:[
+          {id:'hasLeave', cls:'n-dec', html:'◆ Does the Employee Have Requested Leave on a Stat?', w:320, children:[
+            {id:'noLeaveQ', cls:'n-dec', html:'◆ Worked the Stat?', w:300, label:'NO LEAVE', color: 'var(--green)', children:[
+              {id:'workedYes', cls:'n-green-r', html:'✅ <strong>Worked Day</strong><br>Create Stat Pay<br><small>Punch rule generates 1.5x / 2.0x worked pay</small>', w:260, label:'YES', children:[]},
+              {id:'workedNo', cls:'n-green-r', html:'✅ <strong>Regular Day Off</strong><br>Create Stat Pay<br><small>Subject to CA eligibility (worked scheduled days +/- 7 days)</small>', w:260, label:'NO', children:[]}
+            ]},
+            {id:'paidUnpaid', cls:'n-dec', html:'◆ Paid or Unpaid?', w:300, label:'HAS LEAVE', color: 'var(--orange)', children:[
+              {id:'site', cls:'n-dec', html:'◆ Site Status?', w:280, label:'PAID', color: 'var(--blue)', children:[
+                {id:'closed', cls:'n-blue', html:'CLOSED SITE', w:260, label:'CLOSED', children:[
+                  {id:'cTier', cls:'n-dec', html:'◆ Leave Tier?', w:240, children:[
+                    {id:'ct1box', cls:'n-green', html:'<strong>Tier 1: Reversible</strong><br><small>Vacation, Sick, Pers, Wellness</small>', w:220, label:'TIER 1', children:[
+                      {id:'ct1res', cls:'n-green-r', html:'✅ <strong>Action: Reversal</strong><br><small>The system will adjust the leave request to remove only that stat day. This will take place prior to payment. Requested hours go back into their bucket and no leave is paid. EE receives stat pay as normal.</small>', w:250, children:[]}
+                    ]},
+                    {id:'ct2box', cls:'n-red', html:'<strong>Tier 2: Final</strong><br><small>Bereavement, Jury Duty</small>', w:220, label:'TIER 2', children:[
+                      {id:'ct2res', cls:'n-red-r', html:'❌ <strong>No Action</strong><br><small>The leave remains deducted and is paid to the EE. Stat pay is not generated.</small>', w:250, children:[]}
+                    ]}
+                  ]}
+                ]},
+                {id:'open', cls:'n-purple', html:'OPEN SITE', w:260, label:'OPEN', children:[
+                  {id:'oType', cls:'n-dec', html:'◆ Leave Type?', w:240, children:[
+                    {id:'oVac', cls:'n-green', html:'<strong>Vacation</strong><br><small>CA-Protected Leave</small>', w:200, label:'VAC', children:[
+                      {id:'oVacR', cls:'n-green-r', html:'✅ <strong>Action: Reversal</strong><br><small>The system will adjust the leave request to remove only that stat day. This will take place prior to payment. Requested hours go back into their bucket and no leave is paid. EE receives stat pay as normal.</small>', w:250, children:[]}
+                    ]},
+                    {id:'oSPW', cls:'n-orange', html:'<strong>All Other Paid Leave</strong><br><small>Sick, Personal, Wellness, Tier 2</small>', w:220, label:'OTHER PAID', children:[
+                      {id:'oSPWR', cls:'n-orange-r', html:'❌ <strong>Action: Suppress</strong><br><small>The employee does not receive the stat pay and receives the leave requested as normal.</small>', w:250, children:[]}
+                    ]}
+                  ]}
+                ]}
+              ]},
+              {id:'unpaid', cls:'n-red-r', html:'❌ <strong>Unpaid Sick / Leave</strong><br><small>EE is not paid for leave and does not receive the stat. The unpaid leave remains deducted from their accrual balance.</small>', w:250, label:'UNPAID', children:[]}
+            ]}
+          ]}
+        ]}
+      ]
+    };
+
+    const inner = document.getElementById('flowInner');
+    const nodeEls = {};
+
+    function createNodes(n) {
+      const div = document.createElement('div');
+      div.className = 'fnode ' + n.cls;
+      div.style.width = n.w + 'px';
+      div.style.visibility = 'hidden';
+      div.style.position = 'absolute';
+      div.innerHTML = n.html;
+      inner.appendChild(div);
+      nodeEls[n.id] = div;
+      if (n.children) n.children.forEach(createNodes);
+    }
+
+    createNodes(tree);
+
+    function measure(n) {
+      n.measuredH = nodeEls[n.id].offsetHeight;
+      n.measuredW = n.w;
+      if (n.children) n.children.forEach(measure);
+    }
+    measure(tree);
+
+    function calcWidth(n) {
+      if (!n.children || n.children.length === 0) {
+        n.subtreeW = n.measuredW;
+        return n.subtreeW;
+      }
+      let total = 0;
+      n.children.forEach(c => {
+        calcWidth(c);
+        total += c.subtreeW;
+      });
+      total += (n.children.length - 1) * HGAP;
+      n.subtreeW = Math.max(n.measuredW, total);
+      return n.subtreeW;
+    }
+    calcWidth(tree);
+
+    function layout(n, cx, y) {
+      n.x = cx - n.measuredW / 2;
+      n.y = y;
+      if (!n.children || n.children.length === 0) return;
+      const childY = y + n.measuredH + PAD;
+      let totalChildW = 0;
+      n.children.forEach(c => totalChildW += c.subtreeW);
+      totalChildW += (n.children.length - 1) * HGAP;
+      let startX = cx - totalChildW / 2;
+      n.children.forEach(c => {
+        const childCX = startX + c.subtreeW / 2;
+        layout(c, childCX, childY);
+        startX += c.subtreeW + HGAP;
+      });
+    }
+
+    const rootCX = tree.subtreeW / 2;
+    layout(tree, rootCX, 20);
+
+    let maxX = 0, maxY = 0, minX = 0;
+    function findBounds(n) {
+      maxX = Math.max(maxX, n.x + n.measuredW);
+      minX = Math.min(minX, n.x);
+      maxY = Math.max(maxY, n.y + n.measuredH);
+      if (n.children) n.children.forEach(findBounds);
+    }
+    findBounds(tree);
+
+    const shiftX = Math.abs(minX) + 20;
+    function applyShift(n) {
+      n.x += shiftX;
+      if(n.children) n.children.forEach(applyShift);
+    }
+    applyShift(tree);
+
+    inner.style.width = (maxX + shiftX + 40) + 'px';
+    inner.style.height = (maxY + 60) + 'px';
+
+    function placeNodes(n) {
+      const el = nodeEls[n.id];
+      el.style.left = n.x + 'px';
+      el.style.top = n.y + 'px';
+      el.style.visibility = 'visible';
+      if (n.children) n.children.forEach(placeNodes);
+    }
+    placeNodes(tree);
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'flow-svg');
+    svg.setAttribute('width', maxX + shiftX + 40);
+    svg.setAttribute('height', maxY + 60);
+    inner.insertBefore(svg, inner.firstChild);
+
+    function drawConns(n) {
+      if (!n.children) return;
+      n.children.forEach(c => {
+        const x1 = n.x + n.measuredW / 2;
+        const y1 = n.y + n.measuredH;
+        const x2 = c.x + c.measuredW / 2;
+        const y2 = c.y;
+        const col = c.color || '#cbd5e1';
+
+        if (Math.abs(x1 - x2) > 5) {
+          const midY = y1 + (y2 - y1) * 0.45;
+          drawLine(x1, y1, x1, midY, col);
+          drawLine(x1, midY, x2, midY, col);
+          drawLine(x2, midY, x2, y2 - 10, col);
+          drawArrow(x2, y2 - 2, col);
+          if (c.label) drawLabel((x1 + x2) / 2, midY, c.label, col);
+        } else {
+          drawLine(x1, y1, x2, y2 - 10, col);
+          drawArrow(x2, y2 - 2, col);
+          if (c.label) drawLabel(x1, (y1 + y2) / 2, c.label, col);
+        }
+        drawConns(c);
+      });
+    }
+
+    function drawLine(x1, y1, x2, y2, col) {
+      const l = document.createElementNS(svgNS, 'line');
+      l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+      l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+      l.setAttribute('stroke', col);
+      svg.appendChild(l);
+    }
+
+    function drawArrow(x, y, col) {
+      const p = document.createElementNS(svgNS, 'polygon');
+      p.setAttribute('points', `${x-6},${y-8} ${x+6},${y-8} ${x},${y}`);
+      p.setAttribute('fill', col);
+      svg.appendChild(p);
+    }
+
+    function drawLabel(x, y, txt, col) {
+      const t = document.createElementNS(svgNS, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', y + 4);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('fill', col);
+      t.setAttribute('style', 'paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linecap: round;');
+      t.textContent = txt;
+      svg.appendChild(t);
+    }
+
+    drawConns(tree);
+  })();
+</script>
+
+</body>
+</html>
