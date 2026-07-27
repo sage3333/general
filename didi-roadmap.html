@@ -468,7 +468,7 @@
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* typewriter answer */
-  var answer = "You've got 35 people clocked in at YVR right now. 2 left a punch open from last night \u2014 want the names?";
+  var answer = "You've got 35 people clocked in there right now. 2 left a punch open from last night \u2014 want the names?";
   var a = document.getElementById('a'), cur = document.getElementById('cur');
   if (reduce) { a.innerHTML = answer.replace('2 left a punch open','<b>2 left a punch open</b>'); if(cur) cur.style.display='none'; }
   else {
