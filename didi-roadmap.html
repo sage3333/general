@@ -275,7 +275,8 @@
   }
   /* big monitors: scale up so it fills, not floats */
   @media (min-width: 1360px){
-    .cards { grid-template-columns: repeat(auto-fit, minmax(430px,640px)); gap:26px; }
+    .cards { grid-template-columns: repeat(auto-fit, minmax(430px,1fr)); gap:26px; }
+    .cbubble { max-width:78ch; }
     .card { padding:22px 22px 20px; border-radius:20px; }
     .cico { width:56px; height:56px; border-radius:17px; } .cico svg { width:29px; height:29px; }
     .cname { font-size:20px; }
