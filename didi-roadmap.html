@@ -275,7 +275,7 @@
   }
   /* big monitors: scale up so it fills, not floats */
   @media (min-width: 1500px){
-    .cards { grid-template-columns: repeat(auto-fill, minmax(330px,1fr)); gap:20px; }
+    .cards { grid-template-columns: repeat(auto-fit, minmax(370px,560px)); gap:22px; }
     .card { padding:22px 22px 20px; border-radius:20px; }
     .cico { width:48px; height:48px; border-radius:15px; } .cico svg { width:25px; height:25px; }
     .cname { font-size:17.5px; }
@@ -317,8 +317,8 @@
       <h1>Your AI teammate that <span class="hl">answers, gathers, and gets things done.</span></h1>
       <p class="sub">DiDi works over plain <b>email and text</b> &mdash; no new app to learn. Ask a question, get an instant, accurate answer about your team. This is where we're taking it next.</p>
       <div class="heroStats">
-        <div class="s"><b>7</b><span>skills live today</span></div>
-        <div class="s"><b>5</b><span>in development</span></div>
+        <div class="s"><b>9</b><span>skills live today</span></div>
+        <div class="s"><b>3</b><span>in development</span></div>
         <div class="s"><b>14</b><span>lined up after that</span></div>
       </div>
     </div>
@@ -348,20 +348,13 @@
       <div class="mhead">
         <p class="eyebrow">In development &mdash; changes weekly</p>
         <h3>What we're building right now</h3>
-        <span class="mcount">5 skills</span>
+        <span class="mcount">3 skills</span>
         <p class="msub">The heart of this roadmap. Each week we decide &mdash; with sales, implementation, and support &mdash; which skills ship next, so this section moves every week.</p>
       </div>
       <div class="lane">
         <div class="lane-head"><h4>Testing now</h4><span class="phase" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lane-note">Final checks &mdash; nearly ready to switch on.</span></div>
         <div class="cards">
         <div class="card s-building"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L5 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1L9.5 22h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4L19 13a7 7 0 0 0 0-1z"/></svg></span><span class="cname">Set things up by chat</span></div><div class="cbubble">A setup assistant inside the product &mdash; describe what you need and DiDi configures it with you.</div><div class="tags"><span class="cat t-setup">Setup &amp; reports</span></div></div>
-        </div>
-      </div>
-      <div class="lane">
-        <div class="lane-head"><h4>Being built</h4><span class="phase" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></span><span class="lane-note">Code in progress, tried against real accounts.</span></div>
-        <div class="cards">
-        <div class="card s-building"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M5 7l7-5 7 5"/></svg></span><span class="cname">Premium-pay hours</span></div><div class="cbubble">"How many night-shift hours did we run?" &mdash; <b>hours only, never dollars.</b></div><div class="tags"><span class="cat t-ans">Answers you</span></div></div>
-        <div class="card s-building"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span class="cname">Ask about a person</span></div><div class="cbubble">"How many sites does Maria run? Her team's overtime?"</div><div class="tags"><span class="cat t-ans">Answers you</span></div></div>
         </div>
       </div>
       <div class="lane">
@@ -379,7 +372,7 @@
       <div class="mhead">
         <p class="eyebrow">Live today</p>
         <h3>What DiDi already does</h3>
-        <span class="mcount">7 skills</span>
+        <span class="mcount">9 skills</span>
         <p class="msub">Ask any of these right now and get a real answer back in seconds.</p>
       </div>
       <div class="cards">
@@ -390,6 +383,8 @@
         <div class="card s-ready"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6h5M18.5 3.5v5"/></svg></span><span class="cname">Who didn't show</span></div><div class="cbubble">"Give me today's no-shows by site."</div><div class="tags"><span class="cat t-ans">Answers you</span></div></div>
         <div class="card s-ready"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></span><span class="cname">Leave &amp; time off</span></div><div class="cbubble">"Who's off next week? Any pending requests?"</div><div class="tags"><span class="cat t-ans">Answers you</span></div></div>
         <div class="card s-ready"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span><span class="cname">Policy &amp; knowledge base</span></div><div class="cbubble">"What's our procedure for a spill?" &mdash; answered straight from your own handbook and policies.</div><div class="tags"><span class="cat t-ans">Answers you</span></div></div>
+        <div class="card s-ready"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M5 7l7-5 7 5"/></svg></span><span class="cname">Premium-pay hours</span></div><div class="cbubble">"How many night-shift hours did we run?" &mdash; <b>hours only, never dollars.</b></div><div class="tags"><span class="cat t-ans">Answers you</span></div></div>
+        <div class="card s-ready"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span class="cname">Ask about a person</span></div><div class="cbubble">"How many sites does Maria run? Her team's overtime?"</div><div class="tags"><span class="cat t-ans">Answers you</span></div></div>
       </div>
     </div>
 
