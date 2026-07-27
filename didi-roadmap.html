@@ -265,10 +265,6 @@
 
   /* clickable cards + use-case modal */
   .card { cursor:pointer; }
-  .card::before { content:"+"; position:absolute; top:12px; right:14px; width:26px; height:26px; border-radius:50%;
-    border:1.5px solid var(--border); color:var(--ink-3); display:grid; place-items:center; font-size:17px; font-weight:700;
-    line-height:1; z-index:2; transition:transform .2s ease, color .2s ease, border-color .2s ease; background:var(--surface); }
-  @media (hover:hover){ .card:hover::before { color:var(--acc, var(--blue)); border-color:color-mix(in srgb, var(--acc, var(--blue)) 55%, var(--border)); transform:rotate(90deg); } }
   .modal { position:fixed; inset:0; z-index:60; display:grid; place-items:center; padding:22px;
     background:rgba(7,15,31,.5); backdrop-filter:blur(5px); }
   .modal[hidden] { display:none; }
@@ -289,7 +285,7 @@
   #mlist li { background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:11px 15px; font-size:15.5px; line-height:1.5; color:var(--ink-2); }
   #mnote { margin-top:16px; font-size:15.5px; line-height:1.55; color:var(--ink);
     background:color-mix(in srgb, var(--blue) 8%, transparent); border-left:3px solid var(--blue); padding:11px 15px; border-radius:8px; }
-  @media (prefers-reduced-motion: reduce){ .mbox{animation:none;} .card:hover::before{transform:none;} }
+  @media (prefers-reduced-motion: reduce){ .mbox{animation:none;} }
 
   /* ---------- DEPTH BREAK + FOG REVEAL ---------- */
   .depth { height:190px; margin-top:-2px; pointer-events:none;
