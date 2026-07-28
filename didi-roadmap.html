@@ -138,7 +138,7 @@
   @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(93,242,168,.6)} 70%{box-shadow:0 0 0 9px rgba(93,242,168,0)} 100%{box-shadow:0 0 0 0 rgba(93,242,168,0)} }
   @keyframes rise { from{opacity:0; transform:translateY(24px)} to{opacity:1; transform:none} }
   .hero-wave { display:block; width:100%; height:60px; }
-  .hero-wave path { fill: var(--bg-tint); }
+  .hero-wave path { fill: var(--bg); }
 
   /* ---------- HOW IT WORKS ---------- */
   .how { padding:60px 0 8px; }
@@ -155,7 +155,7 @@
   .step p b { color:var(--ink); }
 
   /* ---------- JOURNEY ---------- */
-  .journey { padding:26px 0 20px; }
+  .journey { padding:96px 0 20px; }
   .journey-head { text-align:center; margin-bottom:8px; }
   .journey-head .lead { text-align:center; color:var(--ink-2); font-size:19px; max-width:64ch; margin:14px auto 0; }
   .journey-head .lead b { color:var(--ink); }
@@ -289,12 +289,6 @@
   @media (prefers-reduced-motion: reduce){ .mbox{animation:none;} }
 
   /* ---------- DEPTH BREAK + FOG REVEAL ---------- */
-  .depth { height:76px; margin-top:-2px; pointer-events:none;
-    background:
-      radial-gradient(48% 130px at 26% 12%, color-mix(in srgb, var(--blue) 9%, transparent), transparent 72%),
-      radial-gradient(42% 150px at 74% 46%, color-mix(in srgb, var(--didi) 6%, transparent), transparent 72%),
-      radial-gradient(60% 120px at 50% 90%, color-mix(in srgb, var(--blue) 4%, transparent), transparent 75%),
-      linear-gradient(180deg, var(--bg-tint) 0%, var(--bg) 92%); }
   .cards:not(.in) .card, .fgrid:not(.in) .fcard { opacity:0; }
   .cards.in .card { animation: cardrise .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i,0) * 85ms); }
   .fgrid.in .fcard { animation: cardrise .7s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i,0) * 60ms); }
@@ -379,7 +373,6 @@
   <svg class="hero-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 C360,70 1080,10 1440,40 L1440,60 L0,60 Z"/></svg>
 </section>
 
-<div class="depth" aria-hidden="true"></div>
 
 <!-- ================= ROADMAP ================= -->
 <section class="journey wrap">
