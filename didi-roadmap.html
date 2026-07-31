@@ -1,3 +1,4 @@
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DiDi Product Roadmap</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22d%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%23e040fb%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%237b1fa2%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%2232%22%20height=%2232%22%20rx=%227%22%20fill=%22url(%23d)%22/%3E%3Cpath%20transform=%22translate(4%204)%22%20fill=%22%23fff%22%20d=%22M12%200L14.59%208.41L23%2012L14.59%2015.59L12%2024L9.41%2015.59L1%2012L9.41%208.41L12%200Z%22/%3E%3C/svg%3E">
 <style>
@@ -79,7 +80,8 @@
       radial-gradient(120% 120% at 100% 0%, #0a56c9 0%, transparent 55%),
       linear-gradient(160deg, #0f6ee6 0%, #0a4fbf 55%, #072f7a 100%);
   }
-  #spark { position:absolute; inset:0; width:100%; height:100%; display:block; opacity:.9; }
+  #mesh  { position:absolute; inset:0; width:100%; height:100%; display:block; z-index:0; opacity:.95; }
+  #spark { position:absolute; inset:0; width:100%; height:100%; display:block; z-index:1; opacity:.9; }
   .hero-inner { position:relative; z-index:2; max-width:var(--maxw); margin:0 auto; padding:76px 24px 88px;
     display:grid; grid-template-columns: 1.05fr .95fr; gap:64px; align-items:center; }
   .hero .sub { font-size:21px; }
@@ -299,6 +301,49 @@
     60% { filter:blur(0); }
     to { opacity:1; transform:none; filter:none; } }
 
+
+  /* ---------- FX: progress / cursor glow / ticker / card spotlight ---------- */
+  .progress { position:fixed; top:0; left:0; right:0; height:3px; z-index:70; pointer-events:none; }
+  .progress i { display:block; height:100%; width:0;
+    background:linear-gradient(90deg, var(--blue), var(--blue-bright)); box-shadow:0 0 14px var(--glow); }
+
+  /* soft blurred shape that trails the cursor (ambient, sits behind content) */
+  .ambient { position:fixed; top:0; left:0; width:520px; height:520px; margin:-260px 0 0 -260px;
+    z-index:0; pointer-events:none; opacity:0; border-radius:50%; filter:blur(70px);
+    background:radial-gradient(circle, color-mix(in srgb, var(--blue) 40%, transparent), transparent 68%);
+    transition:opacity .9s ease; }
+  .ambient.on { opacity:.5; }
+  .heroglow { position:absolute; top:0; left:0; width:560px; height:560px; margin:-280px 0 0 -280px;
+    z-index:1; pointer-events:none; opacity:0; border-radius:50%; filter:blur(52px);
+    background:radial-gradient(circle, rgba(255,255,255,.30), rgba(120,190,255,.16) 44%, transparent 70%);
+    transition:opacity .6s ease; }
+  .heroglow.on { opacity:1; }
+
+  /* infinite ticker of real questions people text DiDi */
+  .ticker { position:relative; overflow:hidden; padding:30px 0 34px;
+    background:linear-gradient(180deg, var(--bg-tint) 0%, var(--bg) 100%); border-bottom:1px solid var(--border); }
+  .ticker .tlabel { text-align:center; font-size:12.5px; font-weight:800; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--ink-3); margin-bottom:18px; }
+  .ticker .mask { position:relative; overflow:hidden; }
+  .ticker .mask::before, .ticker .mask::after { content:""; position:absolute; top:0; bottom:0; width:110px; z-index:2; pointer-events:none; }
+  .ticker .mask::before { left:0; background:linear-gradient(90deg, var(--bg-tint), transparent); }
+  .ticker .mask::after { right:0; background:linear-gradient(270deg, var(--bg-tint), transparent); }
+  .track { display:inline-flex; gap:14px; white-space:nowrap; animation:tscroll 46s linear infinite; will-change:transform; }
+  .ticker:hover .track { animation-play-state:paused; }
+  @keyframes tscroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+  .qpill { display:inline-flex; align-items:center; gap:9px; flex:0 0 auto;
+    background:var(--surface); border:1px solid var(--border); border-radius:999px;
+    padding:10px 17px; font-size:14.5px; color:var(--ink-2); box-shadow:var(--elev); }
+  .qpill svg { width:14px; height:14px; flex:0 0 auto; fill:var(--didi-bright); }
+
+  /* pointer-following highlight inside each skill card */
+  .card { isolation:isolate; }
+  .card::before { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+    opacity:0; transition:opacity .22s ease;
+    background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),
+      color-mix(in srgb, var(--acc) 22%, transparent), transparent 68%); }
+  @media (hover:hover){ .card:hover::before { opacity:1; } }
+
   /* reveal */
   .reveal { opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease; }
   .reveal.in { opacity:1; transform:none; }
@@ -310,6 +355,8 @@
     .cards:not(.in) .card, .fgrid:not(.in) .fcard { opacity:1; }
     .cards.in .card, .fgrid.in .fcard { animation:none; }
     .sparkle{animation:none!important;} .didi-grad,.hero h1 .hl{animation:none!important;}
+    .track{animation:none!important;} .ambient,.heroglow{display:none!important;}
+    .card::before{display:none!important;} .progress i{transition:none!important;}
   }
   /* big monitors: scale up so it fills, not floats */
   @media (min-width: 1360px){
@@ -345,9 +392,14 @@
   }
 </style>
 
+<div class="progress" aria-hidden="true"><i id="pbar"></i></div>
+<div class="ambient" id="ambient" aria-hidden="true"></div>
+
 <!-- ================= HERO ================= -->
 <section class="hero">
+  <canvas id="mesh" aria-hidden="true"></canvas>
   <canvas id="spark"></canvas>
+  <div class="heroglow" id="heroglow" aria-hidden="true"></div>
   <div class="hero-inner">
     <div>
       <div class="brandline">
@@ -376,6 +428,12 @@
 </section>
 
 
+<!-- ================= QUESTION TICKER ================= -->
+<section class="ticker" aria-hidden="true">
+  <p class="tlabel">What people actually text DiDi</p>
+  <div class="mask"><div class="track"><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Who's still clocked in at the airport?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Any overtime before Friday?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Which sites had nobody show up today?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Who's off next week?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>What's our procedure for a spill?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Send me the hours by pay type.</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Who's on tonight at Terminal 3?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Which tablets haven't checked in?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Any punches left open last night?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Give me today's no-shows by site.</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Who's still clocked in at the airport?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Any overtime before Friday?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Which sites had nobody show up today?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Who's off next week?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>What's our procedure for a spill?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Send me the hours by pay type.</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Who's on tonight at Terminal 3?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Which tablets haven't checked in?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Any punches left open last night?</span><span class="qpill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/></svg>Give me today's no-shows by site.</span></div></div>
+</section>
+
 <!-- ================= ROADMAP ================= -->
 <section class="journey wrap">
   <div class="journey-head">
@@ -398,7 +456,7 @@
       <div class="lane">
         <div class="lane-head"><h4>Testing now</h4><span class="phase" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lane-note">Final checks &mdash; nearly ready to switch on.</span></div>
         <div class="cards">
-        <div class="card s-building"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L5 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1L9.5 22h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4L19 13a7 7 0 0 0 0-1z"/></svg></span><span class="cname">Set things up by chat</span></div><div class="cbubble">A setup assistant inside the product &mdash; describe what you need and DiDi configures it with you.</div><div class="tags"><span class="cat t-setup">Setup &amp; reports</span></div></div>
+        <div class="card s-building"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L5 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1L9.5 22h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4L19 13a7 7 0 0 0 0-1z"/></svg></span><span class="cname">Set up WorkOps by chat</span></div><div class="cbubble">Describe the form, ticket, or work order you need and DiDi <b>configures WorkOps with you</b> &mdash; in a chat window right inside the product.</div><div class="tags"><span class="cat t-setup">Setup &amp; reports</span></div></div>
         <div class="card s-building"><div class="chead"><span class="cico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg></span><span class="cname">Reports in your email</span></div><div class="cbubble">"Send me a detailed hours breakout by pay type" &mdash; the report arrives <b>attached to DiDi's reply,</b> filterable by employee, site, or hierarchy.</div><div class="tags"><span class="cat t-setup">Setup &amp; reports</span></div></div>
         </div>
       </div>
@@ -622,7 +680,7 @@
 
 <script>
 (function(){
-  var UC = {"Ask about devices": {"ask": ["\"Which tablets have not checked in today?\"", "\"Is anything running an old version of the app?\"", "\"Any site working without a clock right now?\""], "get": "A straight list of what is online, what is stale and what is missing, so a dead tablet stops being a mystery."}, "DiDi on every screen": {"ask": ["\"What am I looking at on this screen?\"", "\"Pull the hours for this crew.\"", "A chat bubble that follows you through the product."], "get": "Answers in the corner of whatever page you are on, with no switch over to email or text."}, "Sort and file your documents": {"ask": ["\"File these signed forms to the right people.\"", "\"Sort this batch by site and rename them properly.\"", "\"Which of these is still missing a signature?\""], "get": "Paperwork named, sorted and filed where it belongs, with a review step before anything moves."}, "Questions nobody planned for": {"ask": ["\"Which supervisors had someone go over eight hours twice this week?\"", "A question nobody wrote a report for.", "No waiting on a new feature to get an answer."], "get": "An answer worked out from your live data, even when the question is brand new."}, "Narrow it down any way you ask": {"ask": ["\"Overtime for the east region, night shift only.\"", "\"Break those covered hours out by site and by pay type.\"", "\"Same question, but just Maria's crew.\""], "get": "Region, site, shift type and person stack up in a single question, and never widen past what you can see."}, "Set up your own alerts": {"ask": ["\"I want to know when anyone is close to overtime.\"", "DiDi asks you a few questions to pin down the details.", "Your answers become a live alert you can change any time."], "get": "Alerts you built yourself over text or email, with no one else writing them for you."}, "Choose who DiDi talks to": {"ask": ["\"Turn DiDi on for the pilot crew only.\"", "\"Add the night supervisors at the two new sites.\"", "\"Nobody else should be able to reach it yet.\""], "get": "A clean boundary on who can get a reply, so a pilot stays a pilot."}, "Hours & overtime": {"ask": ["\"How many hours did my crew work this week?\"", "\"Who is getting close to overtime before Friday?\"", "\"Total hours by site for the last pay period.\""], "get": "Names and hour totals pulled straight from real timecards, in seconds."}, "Still clocked in": {"ask": ["\"Who is still clocked in right now?\"", "\"Any punches left open from last night?\"", "\"Who forgot to clock out at the warehouse?\""], "get": "A live list of open punches with clock-in times, so you can close them out."}, "Low photo-match scores": {"ask": ["\"Any check-ins with low photo scores today?\"", "\"Show me punches that need an identity second look.\"", "\"Which sites keep having low-score check-ins?\""], "get": "The exact punches worth reviewing, so buddy-punching gets caught early."}, "Empty sites": {"ask": ["\"Which sites had nobody show up today?\"", "\"Any locations with zero coverage tonight?\"", "\"Did anyone check in at the new building this week?\""], "get": "Sites with no punches for whatever window you ask about."}, "Who didn't show": {"ask": ["\"Give me today's no-shows by site.\"", "\"Who missed their shift yesterday?\"", "\"Any repeat no-shows this month?\""], "get": "Who was expected but never clocked in, grouped however you ask."}, "Leave & time off": {"ask": ["\"Who is off next week?\"", "\"Any time-off requests waiting on me?\"", "\"How much vacation does my team have coming up?\""], "get": "Approved leave, pending requests, and balances for your people."}, "Policy & knowledge base": {"ask": ["\"What is our procedure for a chemical spill?\"", "\"What does the handbook say about no-call no-shows?\"", "\"What are the steps for equipment lockout at night?\""], "get": "The answer quoted from your own policies and handbook, not the internet."}, "Premium-pay hours": {"ask": ["\"How many night-shift hours did we run last week?\"", "\"Weekend hours by site this month.\"", "\"Which crews are logging the most evening hours?\""], "get": "Hour totals by pay type. Hours only, never dollar amounts."}, "Ask about a person": {"ask": ["\"How many sites does Maria run?\"", "\"What is her team's overtime this week?\"", "\"Who reports to Sam?\""], "get": "A person-centered answer, limited to the people you are allowed to see."}, "Preferred shifts": {"ask": ["DiDi texts each worker: \"Which days and times do you prefer to work?\"", "Answers come back one friendly conversation at a time.", "You receive one clean list, ready for scheduling."], "get": "Great for staffing a new site or filling open shifts with people who actually want them."}, "Set things up by chat": {"ask": ["\"Set up a work order type for night inspections.\"", "\"Create a ticket flow for equipment repairs.\"", "\"Walk me through configuring a new service.\""], "get": "DiDi drafts the setup inside the product; you review and confirm before anything changes."}, "Reports in your email": {"ask": ["\"Email me a detailed hours breakout by pay type for last week.\"", "\"Same report, but only the airport crews.\"", "\"Filter it to one employee, one site, or one branch of the hierarchy.\""], "get": "A ready-to-open report attached right to DiDi's email reply."}, "Custom reports & views": {"ask": ["\"Chart overtime by site for the quarter.\"", "\"Build me a view of open punches by supervisor.\"", "\"Make a weekly report I can rerun every Monday.\""], "get": "DiDi builds the report, screen, or view for how you work, and keeps it fresh."}, "Alerts you choose": {"ask": ["\"Text me if anyone gets within 4 hours of overtime.\"", "\"Send open-punch alerts every morning at 7.\"", "\"Only message me about no-shows at my two biggest sites.\""], "get": "You pick the topics and the rhythm. Informative, never noisy."}, "Rules in plain English": {"ask": ["Write the rule like a policy: \"Flag night work recorded on the wrong pay class.\"", "DiDi compiles it into an exact scheduled check.", "You approve the rule before it ever runs."], "get": "Runs on a schedule with no AI guessing at runtime. Exact and repeatable, every time."}, "Schedules & shifts": {"ask": ["\"Who is on tonight at Terminal 3?\"", "\"Where am I short this week?\"", "\"Who is free to pick up Saturday night?\"", "\"Compare Saturday's schedule to who actually showed up.\""], "get": "Coverage, open shifts, rotations and availability, all answered off the live schedule. Target: August."}, "One tidy daily brief": {"ask": ["Overnight: 3 open punches, 1 no-show, 2 time-off requests.", "At your chosen time, DiDi sends one clean summary.", "Reply to any line to dig deeper."], "get": "One message instead of ten pings."}, "Checks before it nudges": {"ask": ["A reminder was created last week about an unapproved timecard.", "Before sending, DiDi re-checks: is it still unapproved?", "Already handled? The nudge quietly disappears."], "get": "No stale reminders, and your quiet hours are respected."}, "Fill out your paperwork": {"ask": ["Hand DiDi a blank form once.", "\"Fill this out for everyone hired this week.\"", "Completed, signature-ready copies come back per employee."], "get": "Your documents, filled from data already in Findd."}, "Approve time off": {"ask": ["\"Approve Maria's Friday request.\"", "DiDi shows you exactly what you are approving.", "You say yes; it is done and logged."], "get": "Always confirms before acting. Nothing happens without your say-so."}, "Approve a timecard": {"ask": ["\"Approve Sam's timecard for last week.\"", "DiDi summarizes the hours and anything unusual first.", "You confirm; it signs off for payroll."], "get": "A guarded, two-step approval right from your phone."}, "Read photos & files": {"ask": ["Text a photo of a handwritten schedule.", "Email a PDF or spreadsheet and ask questions about it.", "\"Does this checklist match the work we logged?\""], "get": "DiDi understands what is inside the files you send it."}, "Confirm contact details": {"ask": ["\"Is this still your phone number?\"", "DiDi quietly asks each worker over text.", "Your records fill in and fix themselves."], "get": "Cleaner contact data without a single spreadsheet."}, "Take an incident report": {"ask": ["A worker texts: \"Someone got hurt at dock 4.\"", "DiDi walks them through what, where, when, and who.", "A clean, complete report is filed automatically."], "get": "Consistent incident records, captured in the moment."}, "Mark things handled": {"ask": ["\"Got it, reviewed\" clears the flag.", "\"Snooze that until Monday.\"", "\"Mark those three punches as checked.\""], "get": "Keep your queue clean without opening the app."}, "Adjust schedules": {"ask": ["\"Move Sam to Tuesday nights.\"", "\"Swap Maria and Alex this weekend.\"", "Within your authority, and only on your request."], "get": "The highest-trust actions come last, with the strongest guardrails."}, "Bulk updates": {"ask": ["\"Update the job assignment for these 40 people.\"", "DiDi prepares the full change list for you.", "A required review-and-confirm gate before anything applies."], "get": "Many records at once, never without a human check."}};
+  var UC = {"Ask about devices": {"ask": ["\"Which tablets have not checked in today?\"", "\"Is anything running an old version of the app?\"", "\"Any site working without a clock right now?\""], "get": "A straight list of what is online, what is stale and what is missing, so a dead tablet stops being a mystery."}, "DiDi on every screen": {"ask": ["\"What am I looking at on this screen?\"", "\"Pull the hours for this crew.\"", "A chat bubble that follows you through the product."], "get": "Answers in the corner of whatever page you are on, with no switch over to email or text."}, "Sort and file your documents": {"ask": ["\"File these signed forms to the right people.\"", "\"Sort this batch by site and rename them properly.\"", "\"Which of these is still missing a signature?\""], "get": "Paperwork named, sorted and filed where it belongs, with a review step before anything moves."}, "Questions nobody planned for": {"ask": ["\"Which supervisors had someone go over eight hours twice this week?\"", "A question nobody wrote a report for.", "No waiting on a new feature to get an answer."], "get": "An answer worked out from your live data, even when the question is brand new."}, "Narrow it down any way you ask": {"ask": ["\"Overtime for the east region, night shift only.\"", "\"Break those covered hours out by site and by pay type.\"", "\"Same question, but just Maria's crew.\""], "get": "Region, site, shift type and person stack up in a single question, and never widen past what you can see."}, "Set up your own alerts": {"ask": ["\"I want to know when anyone is close to overtime.\"", "DiDi asks you a few questions to pin down the details.", "Your answers become a live alert you can change any time."], "get": "Alerts you built yourself over text or email, with no one else writing them for you."}, "Choose who DiDi talks to": {"ask": ["\"Turn DiDi on for the pilot crew only.\"", "\"Add the night supervisors at the two new sites.\"", "\"Nobody else should be able to reach it yet.\""], "get": "A clean boundary on who can get a reply, so a pilot stays a pilot."}, "Hours & overtime": {"ask": ["\"How many hours did my crew work this week?\"", "\"Who is getting close to overtime before Friday?\"", "\"Total hours by site for the last pay period.\""], "get": "Names and hour totals pulled straight from real timecards, in seconds."}, "Still clocked in": {"ask": ["\"Who is still clocked in right now?\"", "\"Any punches left open from last night?\"", "\"Who forgot to clock out at the warehouse?\""], "get": "A live list of open punches with clock-in times, so you can close them out."}, "Low photo-match scores": {"ask": ["\"Any check-ins with low photo scores today?\"", "\"Show me punches that need an identity second look.\"", "\"Which sites keep having low-score check-ins?\""], "get": "The exact punches worth reviewing, so buddy-punching gets caught early."}, "Empty sites": {"ask": ["\"Which sites had nobody show up today?\"", "\"Any locations with zero coverage tonight?\"", "\"Did anyone check in at the new building this week?\""], "get": "Sites with no punches for whatever window you ask about."}, "Who didn't show": {"ask": ["\"Give me today's no-shows by site.\"", "\"Who missed their shift yesterday?\"", "\"Any repeat no-shows this month?\""], "get": "Who was expected but never clocked in, grouped however you ask."}, "Leave & time off": {"ask": ["\"Who is off next week?\"", "\"Any time-off requests waiting on me?\"", "\"How much vacation does my team have coming up?\""], "get": "Approved leave, pending requests, and balances for your people."}, "Policy & knowledge base": {"ask": ["\"What is our procedure for a chemical spill?\"", "\"What does the handbook say about no-call no-shows?\"", "\"What are the steps for equipment lockout at night?\""], "get": "The answer quoted from your own policies and handbook, not the internet."}, "Premium-pay hours": {"ask": ["\"How many night-shift hours did we run last week?\"", "\"Weekend hours by site this month.\"", "\"Which crews are logging the most evening hours?\""], "get": "Hour totals by pay type. Hours only, never dollar amounts."}, "Ask about a person": {"ask": ["\"How many sites does Maria run?\"", "\"What is her team's overtime this week?\"", "\"Who reports to Sam?\""], "get": "A person-centered answer, limited to the people you are allowed to see."}, "Preferred shifts": {"ask": ["DiDi texts each worker: \"Which days and times do you prefer to work?\"", "Answers come back one friendly conversation at a time.", "You receive one clean list, ready for scheduling."], "get": "Great for staffing a new site or filling open shifts with people who actually want them."}, "Set up WorkOps by chat": {"ask": ["\"Set up a work order type for night inspections.\"", "\"Build a daily safety form for the crew to fill out.\"", "\"Create a ticket flow for equipment repairs.\""], "get": "DiDi drafts the WorkOps setup inside the product; you review and confirm before anything goes live."}, "Reports in your email": {"ask": ["\"Email me a detailed hours breakout by pay type for last week.\"", "\"Same report, but only the airport crews.\"", "\"Filter it to one employee, one site, or one branch of the hierarchy.\""], "get": "A ready-to-open report attached right to DiDi's email reply."}, "Custom reports & views": {"ask": ["\"Chart overtime by site for the quarter.\"", "\"Build me a view of open punches by supervisor.\"", "\"Make a weekly report I can rerun every Monday.\""], "get": "DiDi builds the report, screen, or view for how you work, and keeps it fresh."}, "Alerts you choose": {"ask": ["\"Text me if anyone gets within 4 hours of overtime.\"", "\"Send open-punch alerts every morning at 7.\"", "\"Only message me about no-shows at my two biggest sites.\""], "get": "You pick the topics and the rhythm. Informative, never noisy."}, "Rules in plain English": {"ask": ["Write the rule like a policy: \"Flag night work recorded on the wrong pay class.\"", "DiDi compiles it into an exact scheduled check.", "You approve the rule before it ever runs."], "get": "Runs on a schedule with no AI guessing at runtime. Exact and repeatable, every time."}, "Schedules & shifts": {"ask": ["\"Who is on tonight at Terminal 3?\"", "\"Where am I short this week?\"", "\"Who is free to pick up Saturday night?\"", "\"Compare Saturday's schedule to who actually showed up.\""], "get": "Coverage, open shifts, rotations and availability, all answered off the live schedule. Target: August."}, "One tidy daily brief": {"ask": ["Overnight: 3 open punches, 1 no-show, 2 time-off requests.", "At your chosen time, DiDi sends one clean summary.", "Reply to any line to dig deeper."], "get": "One message instead of ten pings."}, "Checks before it nudges": {"ask": ["A reminder was created last week about an unapproved timecard.", "Before sending, DiDi re-checks: is it still unapproved?", "Already handled? The nudge quietly disappears."], "get": "No stale reminders, and your quiet hours are respected."}, "Fill out your paperwork": {"ask": ["Hand DiDi a blank form once.", "\"Fill this out for everyone hired this week.\"", "Completed, signature-ready copies come back per employee."], "get": "Your documents, filled from data already in Findd."}, "Approve time off": {"ask": ["\"Approve Maria's Friday request.\"", "DiDi shows you exactly what you are approving.", "You say yes; it is done and logged."], "get": "Always confirms before acting. Nothing happens without your say-so."}, "Approve a timecard": {"ask": ["\"Approve Sam's timecard for last week.\"", "DiDi summarizes the hours and anything unusual first.", "You confirm; it signs off for payroll."], "get": "A guarded, two-step approval right from your phone."}, "Read photos & files": {"ask": ["Text a photo of a handwritten schedule.", "Email a PDF or spreadsheet and ask questions about it.", "\"Does this checklist match the work we logged?\""], "get": "DiDi understands what is inside the files you send it."}, "Confirm contact details": {"ask": ["\"Is this still your phone number?\"", "DiDi quietly asks each worker over text.", "Your records fill in and fix themselves."], "get": "Cleaner contact data without a single spreadsheet."}, "Take an incident report": {"ask": ["A worker texts: \"Someone got hurt at dock 4.\"", "DiDi walks them through what, where, when, and who.", "A clean, complete report is filed automatically."], "get": "Consistent incident records, captured in the moment."}, "Mark things handled": {"ask": ["\"Got it, reviewed\" clears the flag.", "\"Snooze that until Monday.\"", "\"Mark those three punches as checked.\""], "get": "Keep your queue clean without opening the app."}, "Adjust schedules": {"ask": ["\"Move Sam to Tuesday nights.\"", "\"Swap Maria and Alex this weekend.\"", "Within your authority, and only on your request."], "get": "The highest-trust actions come last, with the strongest guardrails."}, "Bulk updates": {"ask": ["\"Update the job assignment for these 40 people.\"", "DiDi prepares the full change list for you.", "A required review-and-confirm gate before anything applies."], "get": "Many records at once, never without a human check."}};
   var modal = document.getElementById('ucmodal'), mtitle = document.getElementById('mtitle'),
       mico = document.getElementById('mico'), mlist = document.getElementById('mlist'),
       mnote = document.getElementById('mnote'), mclose = document.getElementById('mclose');
@@ -645,5 +703,195 @@
   mclose.addEventListener('click', close);
   modal.addEventListener('click', function(e){ if(e.target===modal) close(); });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !modal.hidden) close(); });
+})();
+</script>
+
+<script>
+(function(){
+  var mq = window.matchMedia || function(){ return {matches:false}; };
+  var reduce = mq('(prefers-reduced-motion: reduce)').matches;
+  var fine   = mq('(pointer:fine)').matches;
+
+  /* --- scroll progress bar --- */
+  var pbar = document.getElementById('pbar');
+  if (pbar) {
+    var prog = function(){
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      pbar.style.width = (max > 0 ? (window.pageYOffset / max) * 100 : 0) + '%';
+    };
+    window.addEventListener('scroll', prog, {passive:true});
+    window.addEventListener('resize', prog);
+    prog();
+  }
+
+  /* --- hero stats count up --- */
+  var stats = document.querySelectorAll('.heroStats .s b');
+  for (var i = 0; i < stats.length; i++) (function(el){
+    var target = parseInt(el.textContent, 10);
+    if (isNaN(target) || reduce) return;
+    var t0 = null, dur = 1100;
+    /* no pre-zeroing: if rAF never runs (background tab) the real number stays visible */
+    var step = function(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step); else el.textContent = String(target);
+    };
+    requestAnimationFrame(step);
+  })(stats[i]);
+
+  /* --- blurred shapes that trail the cursor --- */
+  if (fine && !reduce) {
+    var hero = document.querySelector('.hero'),
+        hg   = document.getElementById('heroglow'),
+        amb  = document.getElementById('ambient');
+    var hx=0, hy=0, htx=0, hty=0, ax=0, ay=0, atx=0, aty=0;
+    if (hero && hg) {
+      hero.addEventListener('mousemove', function(e){
+        var r = hero.getBoundingClientRect();
+        htx = e.clientX - r.left; hty = e.clientY - r.top;
+        hg.className = 'heroglow on';
+      });
+      hero.addEventListener('mouseleave', function(){ hg.className = 'heroglow'; });
+    }
+    if (amb) {
+      document.addEventListener('mousemove', function(e){
+        atx = e.clientX; aty = e.clientY;
+        if (amb.className.indexOf('on') < 0) amb.className = 'ambient on';
+      }, {passive:true});
+    }
+    (function loop(){
+      hx += (htx - hx) * 0.08; hy += (hty - hy) * 0.08;
+      ax += (atx - ax) * 0.05; ay += (aty - ay) * 0.05;
+      if (hg)  hg.style.transform  = 'translate(' + hx.toFixed(1) + 'px,' + hy.toFixed(1) + 'px)';
+      if (amb) amb.style.transform = 'translate(' + ax.toFixed(1) + 'px,' + ay.toFixed(1) + 'px)';
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* --- pointer-following highlight on cards --- */
+  if (fine && !reduce) {
+    var cards = document.querySelectorAll('.card');
+    for (var c = 0; c < cards.length; c++) (function(el){
+      el.addEventListener('mousemove', function(e){
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', (((e.clientX - r.left) / r.width) * 100).toFixed(1) + '%');
+        el.style.setProperty('--my', (((e.clientY - r.top) / r.height) * 100).toFixed(1) + '%');
+      }, {passive:true});
+    })(cards[c]);
+  }
+})();
+</script>
+
+<script>
+/* ShaderGradient-style flowing mesh gradient, hand-rolled in raw WebGL.
+   No three.js / react-three-fiber: this page ships as one self-contained file. */
+(function(){
+  var cv = document.getElementById('mesh');
+  if (!cv) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+var VS = [
+'attribute vec2 a_pos;',
+'void main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }'
+].join('\n');
+
+var FS = [
+'precision highp float;',
+'uniform vec2 u_res;',
+'uniform float u_t;',
+/* value noise + fbm: the same domain-warp idea ShaderGradient renders via three.js */
+'vec2 hash2(vec2 p){',
+'  p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));',
+'  return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);',
+'}',
+'float noise(vec2 p){',
+'  vec2 i = floor(p), f = fract(p);',
+'  vec2 u = f * f * (3.0 - 2.0 * f);',
+'  return mix(mix(dot(hash2(i + vec2(0.0,0.0)), f - vec2(0.0,0.0)),',
+'                 dot(hash2(i + vec2(1.0,0.0)), f - vec2(1.0,0.0)), u.x),',
+'             mix(dot(hash2(i + vec2(0.0,1.0)), f - vec2(0.0,1.0)),',
+'                 dot(hash2(i + vec2(1.0,1.0)), f - vec2(1.0,1.0)), u.x), u.y);',
+'}',
+'float fbm(vec2 p){',
+'  float v = 0.0, a = 0.5;',
+'  for (int i = 0; i < 5; i++){ v += a * noise(p); p *= 2.02; a *= 0.5; }',
+'  return v;',
+'}',
+'void main(){',
+'  vec2 uv = gl_FragCoord.xy / u_res;',
+'  vec2 p = uv; p.x *= u_res.x / u_res.y;',
+'  float t = u_t * 0.055;',
+/* two-pass domain warp -- this is what gives the slow liquid drift */
+'  vec2 q = vec2(fbm(p * 1.6 + vec2(0.0, t)), fbm(p * 1.6 + vec2(5.2, -t)));',
+'  float f = fbm(p * 2.2 + q * 1.45 + vec2(t * 0.7, -t * 0.5));',
+'  f = f * 0.5 + 0.5;',
+/* Findd palette: deep navy -> blue-deep -> blue -> blue-bright, amber only on the crest */
+'  vec3 deep = vec3(0.027, 0.184, 0.478);',
+'  vec3 mid  = vec3(0.039, 0.337, 0.788);',
+'  vec3 blue = vec3(0.067, 0.506, 0.949);',
+'  vec3 brt  = vec3(0.200, 0.631, 1.000);',
+'  vec3 col = mix(deep, mid,  smoothstep(0.15, 0.50, f));',
+'  col = mix(col, blue, smoothstep(0.45, 0.75, f));',
+'  col = mix(col, brt,  smoothstep(0.70, 0.95, f));',
+'  col = mix(col, vec3(1.0, 0.70, 0.0), smoothstep(0.88, 1.0, f) * 0.26);',
+/* keep the headline side darker so white text stays readable */
+'  col *= mix(0.76, 1.04, smoothstep(0.0, 0.78, uv.x));',
+'  float vig = smoothstep(1.20, 0.22, length(uv - vec2(0.34, 0.5)));',
+'  col *= 0.74 + 0.40 * vig;',
+'  gl_FragColor = vec4(col, 1.0);',
+'}'
+].join('\n');
+
+  var gl = null;
+  try { gl = cv.getContext('webgl', {antialias:false, alpha:true, depth:false, powerPreference:'low-power'})
+             || cv.getContext('experimental-webgl'); } catch(e) { gl = null; }
+  /* no WebGL -> leave the canvas empty and let the CSS hero gradient show through */
+  if (!gl) { cv.style.display = 'none'; return; }
+
+  function compile(type, src){
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      window.__meshErr = gl.getShaderInfoLog(s); return null;
+    }
+    return s;
+  }
+  var vs = compile(gl.VERTEX_SHADER, VS), fs = compile(gl.FRAGMENT_SHADER, FS);
+  if (!vs || !fs) { cv.style.display = 'none'; return; }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    window.__meshErr = gl.getProgramInfoLog(prog); cv.style.display = 'none'; return;
+  }
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  var aPos = gl.getAttribLocation(prog, 'a_pos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+  var uRes = gl.getUniformLocation(prog, 'u_res'), uT = gl.getUniformLocation(prog, 'u_t');
+
+  /* render below native res: the field is smooth, so this is invisible and much cheaper */
+  var SCALE = 0.7;
+  function size(){
+    var r = cv.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5) * SCALE;
+    var w = Math.max(2, Math.round(r.width * dpr)), hh = Math.max(2, Math.round(r.height * dpr));
+    if (cv.width !== w || cv.height !== hh) { cv.width = w; cv.height = hh; }
+    gl.viewport(0, 0, cv.width, cv.height);
+    gl.uniform2f(uRes, cv.width, cv.height);
+  }
+  function frame(ms){
+    gl.uniform1f(uT, ms / 1000);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  size();
+  window.__meshReady = true;
+  frame(0);                      /* always paint at least one frame */
+  window.addEventListener('resize', function(){ size(); if (reduce) frame(0); });
 })();
 </script>
