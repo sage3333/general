@@ -1,0 +1,319 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PJS Austin — Vacancy Workflow</title>
+<style>
+  :root{
+    --paper:#ffffff; --ink:#0f1d31; --muted:#54667e; --line:#dde5f0;
+    --blue:#1567f3; --blue-ink:#0b3e9c; --blue-soft:#ecf2fe;
+    --purple:#7b1fa2; --purple-soft:#f6edfb; --purple-line:#e3c9f0;
+    --warn:#b4530a; --warn-soft:#fbefe4;
+    --good:#0c7c55; --good-soft:#e6f5ee;
+    --card:#ffffff; --well:#f5f8fc;
+    --shadow:0 1px 2px rgba(15,29,49,.06),0 10px 28px rgba(15,29,49,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#0c1420; --ink:#e8eef7; --muted:#93a3b8; --line:#233145;
+      --blue:#5b93ff; --blue-ink:#a8c4ff; --blue-soft:#132542;
+      --purple:#c77fe0; --purple-soft:#291a38; --purple-line:#4a2f61;
+      --warn:#e8925a; --warn-soft:#33200f;
+      --good:#4cc79a; --good-soft:#0f2c21;
+      --card:#121d2e; --well:#101a29;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#ffffff; --ink:#0f1d31; --muted:#54667e; --line:#dde5f0;
+    --blue:#1567f3; --blue-ink:#0b3e9c; --blue-soft:#ecf2fe;
+    --purple:#7b1fa2; --purple-soft:#f6edfb; --purple-line:#e3c9f0;
+    --warn:#b4530a; --warn-soft:#fbefe4;
+    --good:#0c7c55; --good-soft:#e6f5ee;
+    --card:#ffffff; --well:#f5f8fc;
+    --shadow:0 1px 2px rgba(15,29,49,.06),0 10px 28px rgba(15,29,49,.08);
+  }
+  :root[data-theme="dark"]{
+    --paper:#0c1420; --ink:#e8eef7; --muted:#93a3b8; --line:#233145;
+    --blue:#5b93ff; --blue-ink:#a8c4ff; --blue-soft:#132542;
+    --purple:#c77fe0; --purple-soft:#291a38; --purple-line:#4a2f61;
+    --warn:#e8925a; --warn-soft:#33200f;
+    --good:#4cc79a; --good-soft:#0f2c21;
+    --card:#121d2e; --well:#101a29;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif;
+    font-size:16px; line-height:1.5;
+  }
+  .wrap{max-width:1100px; margin:0 auto; padding:0 28px 80px}
+  .eyebrow{font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--blue); margin:0 0 12px}
+  h1{font-size:clamp(28px,4vw,42px); line-height:1.1; font-weight:700; letter-spacing:-.02em; margin:0; text-wrap:balance}
+  header{padding-top:56px; text-align:center}
+
+  /* stepper nav */
+  .pills{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin:34px 0 8px}
+  .pill{
+    display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line); background:var(--card);
+    color:var(--muted); border-radius:999px; padding:8px 16px 8px 8px; font:inherit; font-size:13.5px; font-weight:600;
+    cursor:pointer; transition:all .18s ease;
+  }
+  .pill .n{
+    width:24px; height:24px; border-radius:50%; background:var(--well); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-variant-numeric:tabular-nums;
+  }
+  .pill:hover{border-color:var(--blue)}
+  .pill.active{background:var(--blue-soft); border-color:var(--blue); color:var(--blue-ink)}
+  .pill.active .n{background:var(--blue); border-color:var(--blue); color:#fff}
+  .pill.past .n{background:var(--good-soft); border-color:transparent; color:var(--good)}
+  .pill:focus-visible{outline:2px solid var(--blue); outline-offset:2px}
+
+  .caption{min-height:52px; text-align:center; margin:10px auto 26px; max-width:60ch}
+  .caption [data-steps]{font-size:17px; color:var(--muted)}
+  .caption b{color:var(--ink)}
+
+  /* stage */
+  .stage{display:grid; grid-template-columns:300px 1fr; gap:36px; align-items:start}
+  @media(max-width:920px){.stage{grid-template-columns:1fr; gap:28px}}
+
+  /* phone */
+  .phone{background:var(--card); border:1px solid var(--line); border-radius:26px; padding:18px 16px 16px; max-width:300px; margin:0 auto; box-shadow:var(--shadow); min-height:380px}
+  .phone .bar{width:52px; height:5px; border-radius:99px; background:var(--line); margin:0 auto 12px}
+  .phone .who{text-align:center; font-size:12px; color:var(--muted); margin-bottom:12px}
+  .phone .who b{color:var(--purple)}
+  .msg{max-width:88%; padding:8px 13px; border-radius:16px; font-size:13px; line-height:1.42; margin:6px 0; clear:both}
+  .msg.am{float:right; background:var(--blue); color:#fff; border-bottom-right-radius:5px}
+  .msg.didi{float:left; background:var(--purple-soft); color:var(--ink); border-bottom-left-radius:5px}
+  .msg .sp{color:var(--purple); font-weight:600}
+  .phone .ts{clear:both; text-align:center; font-size:10.5px; color:var(--muted); padding-top:7px}
+  .phone::after{content:""; display:block; clear:both}
+
+  /* ---- Findd Job Postings mock (mirrors HR JobPostingsList) ---- */
+  .findd{background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+  .fbar{display:flex; align-items:center; gap:8px; padding:10px 16px; border-bottom:1px solid var(--line); background:var(--well)}
+  .fbar .logo{font-weight:700; font-size:14px; letter-spacing:-.02em; color:var(--blue)}
+  .fbar .crumb{font-size:12px; color:var(--muted)}
+  .fbar .env{margin-left:auto; font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:2px 8px}
+  .ftool{display:flex; align-items:center; gap:14px; padding:14px 16px 10px; flex-wrap:wrap}
+  .ftool h3{margin:0; font-size:17px; font-weight:600; letter-spacing:-.01em}
+  .fsearch{margin-left:auto; display:flex; align-items:center; gap:7px; border-bottom:1px solid var(--line); padding:3px 4px; color:var(--muted); font-size:12.5px; min-width:110px}
+  .fstatus{font-size:12.5px; color:var(--muted); border-bottom:1px solid var(--line); padding:3px 4px}
+  .fstatus b{color:var(--ink); font-weight:500}
+  .fadd{width:26px; height:26px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600; line-height:1}
+  .ftablewrap{overflow-x:auto}
+  .ftable{border-collapse:collapse; width:100%; min-width:640px; font-size:12.5px}
+  .ftable th{
+    text-align:left; font-size:11px; font-weight:600; color:var(--muted); letter-spacing:.02em;
+    padding:8px 10px; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  .ftable td{padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; white-space:nowrap; font-variant-numeric:tabular-nums}
+  .ftable td.ttl{white-space:normal; min-width:170px}
+  .ftable .t{font-weight:600; font-size:13px}
+  .ftable .didi-src{display:block; font-size:11px; color:var(--purple); margin-top:1px}
+  .ftable td.num{text-align:center}
+  .ftable th.num{text-align:center}
+  .ftable .qr{color:var(--muted); font-size:13px}
+  tr.newrow td{background:var(--purple-soft)}
+  tr.closedrow td{background:var(--well); color:var(--muted)}
+  tr.closedrow .t{color:var(--muted)}
+  .chipstat{font-size:10.5px; font-weight:700; border-radius:999px; padding:2px 8px; white-space:nowrap}
+  .chipstat.open{background:var(--good-soft); color:var(--good)}
+  .chipstat.filled{background:var(--well); color:var(--muted); border:1px solid var(--line)}
+  .ffoot{display:flex; justify-content:flex-end; gap:18px; padding:9px 16px; font-size:11.5px; color:var(--muted)}
+
+  /* detail drawer (step 3) */
+  .drawer{border-top:1px dashed var(--purple-line); background:var(--purple-soft); padding:12px 16px 14px}
+  .drawer .lbl{font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--purple); margin-bottom:8px}
+  .cand{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--purple-line); border-radius:10px; padding:8px 12px; margin-top:6px; font-size:13px}
+  .cand .av{width:26px; height:26px; border-radius:50%; background:var(--blue-soft); color:var(--blue-ink); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0}
+  .cand .ci{display:flex; flex-direction:column; min-width:0}
+  .cand .nm{font-weight:600}
+  .cand .why{font-size:11.5px; color:var(--muted); line-height:1.35}
+  .cand .why b{color:var(--purple); font-weight:600}
+  .cand .d{margin-left:auto; color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap; flex-shrink:0}
+  .drawer .rank{font-size:11px; color:var(--muted); margin:-4px 0 8px}
+  .cand.pick{border-color:var(--good); background:var(--good-soft)}
+  .cand.pick .d{color:var(--good); font-weight:700}
+  .fillnote{padding:12px 16px; border-top:1px dashed var(--line); font-size:12.5px; color:var(--good); background:var(--good-soft)}
+
+  /* nav buttons */
+  .navbtns{display:flex; justify-content:center; gap:12px; margin-top:32px}
+  .btn{
+    font:inherit; font-size:14px; font-weight:600; border-radius:10px; padding:10px 22px; cursor:pointer;
+    border:1px solid var(--line); background:var(--card); color:var(--ink); transition:all .15s ease;
+  }
+  .btn.primary{background:var(--blue); border-color:var(--blue); color:#fff}
+  .btn:disabled{opacity:.4; cursor:default}
+  .btn:not(:disabled):hover{transform:translateY(-1px)}
+  .btn:focus-visible{outline:2px solid var(--blue); outline-offset:2px}
+
+  /* step visibility */
+  [data-steps]{display:none}
+  .msg[data-steps].on{display:block; animation:rise .3s ease both}
+  .ts[data-steps].on{display:block}
+  span[data-steps].on{display:inline}
+  .caption [data-steps].on{display:block; animation:rise .3s ease both}
+  tr[data-steps].on{display:table-row}
+  .drawer[data-steps].on{display:block; animation:rise .3s ease both}
+  .fillnote[data-steps].on{display:block; animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion: reduce){
+    .msg[data-steps].on,.caption [data-steps].on,.drawer[data-steps].on,.fillnote[data-steps].on{animation:none}
+    .btn:not(:disabled):hover{transform:none}
+  }
+
+  footer{margin-top:80px; padding-top:20px; border-top:1px solid var(--line); font-size:12.5px; color:var(--muted); text-align:center}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Findd × PJS Austin · Vacancy Workflow · July 2026</p>
+    <h1>One text opens a rec. One hire closes it.</h1>
+  </header>
+
+  <div class="pills" role="tablist" aria-label="Workflow steps">
+    <button class="pill" data-go="1" role="tab"><span class="n">1</span>Manager reports</button>
+    <button class="pill" data-go="2" role="tab"><span class="n">2</span>Posting created</button>
+    <button class="pill" data-go="3" role="tab"><span class="n">3</span>Candidates suggested</button>
+    <button class="pill" data-go="4" role="tab"><span class="n">4</span>Filled &amp; closed</button>
+  </div>
+
+  <div class="caption" aria-live="polite">
+    <div data-steps="1">The area manager texts <b>DiDi</b> the need. Jorge never opens Findd — but HR's screen is about to update.</div>
+    <div data-steps="2">DiDi creates a real <b>Job Posting in Findd</b> — same screen, same table HR already hires from.</div>
+    <div data-steps="3">DiDi <b>auto-suggests candidates</b> and attaches them to the posting — closest first.</div>
+    <div data-steps="4">Maria's hire consumes the opening — <b>Hired 1 of 1</b>, and the posting closes itself.</div>
+  </div>
+
+  <div class="stage">
+
+    <div class="phone" aria-label="Text conversation">
+      <div class="bar"></div>
+      <div class="who">
+        <span data-steps="1 2"><b>✦ DiDi</b> · Jorge — Area Manager</span>
+        <span data-steps="3 4"><b>✦ DiDi</b> · shared HR inbox</span>
+      </div>
+
+      <!-- steps 1–2: manager convo -->
+      <div class="msg am" data-steps="1 2">Hey DiDi — I need someone at The Republic. Night cleaner, $16/hr</div>
+      <div class="msg didi" data-steps="1 2"><span class="sp">✦</span> Got it. What days and hours?</div>
+      <div class="msg am" data-steps="1 2">Mon–Fri, 6 to 10</div>
+      <div class="msg didi" data-steps="2"><span class="sp">✦</span> Job posting created in Findd — Night Cleaner · The Republic · $16/hr · M–F 6–10p · 1 opening. I'll text you when it's filled.</div>
+
+      <!-- steps 3–4: HR inbox -->
+      <div class="msg didi" data-steps="3"><span class="sp">✦</span> New posting: Night Cleaner at The Republic, $16/hr, M–F 6–10p. Closest available candidates:<br>1 · Maria G — 1.8 mi, evenings free, $16/hr<br>2 · Jose R — 3.2 mi, evenings free, $16.50/hr<br>3 · Luis T — 4.5 mi, weeknights after 5p</div>
+      <div class="msg am" data-steps="3">Let's go with Maria G</div>
+      <div class="msg didi" data-steps="3"><span class="sp">✦</span> Noted — when her hire completes, I'll close the posting.</div>
+      <div class="ts" data-steps="4">6 days after the posting opened</div>
+      <div class="msg didi" data-steps="4"><span class="sp">✦</span> Maria G's hire is complete — posting closed. Open 6 days. I've texted Jorge that she starts Monday.</div>
+    </div>
+
+    <div class="findd" aria-label="Findd Job Postings screen">
+      <div class="fbar"><span class="logo">findd</span><span class="crumb">/ HR / Job Postings</span><span class="env">PJS Austin</span></div>
+      <div class="ftool">
+        <h3>Job Postings</h3>
+        <span class="fsearch">🔍 Search</span>
+        <span class="fstatus">Status: <b>Active ▾</b></span>
+        <span class="fadd">+</span>
+      </div>
+      <div class="ftablewrap">
+        <table class="ftable">
+          <thead>
+            <tr>
+              <th>Id</th><th>Title</th><th>Start</th><th>Occupation</th><th>Job ID</th>
+              <th class="num">Openings</th><th class="num">Hired</th><th class="num">Candidates</th><th></th><th>QR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>GC-01</td>
+              <td class="ttl"><span class="t">General Cleaner — Always Hiring</span></td>
+              <td>01/05/2026</td><td>General Cleaner</td><td>—</td>
+              <td class="num">5</td><td class="num">12</td><td class="num">24</td>
+              <td><span class="chipstat open">Active</span></td><td class="qr">⬇︎ ↗</td>
+            </tr>
+            <tr class="newrow" data-steps="2">
+              <td>PJS-0231</td>
+              <td class="ttl"><span class="t">Night Cleaner — The Republic</span><span class="didi-src">✦ Created by DiDi from Jorge's text · 4:12 PM</span></td>
+              <td>07/28/2026</td><td>Night Cleaner</td><td>3128</td>
+              <td class="num">1</td><td class="num">0</td><td class="num">0</td>
+              <td><span class="chipstat open">Active</span></td><td class="qr">⬇︎ ↗</td>
+            </tr>
+            <tr class="newrow" data-steps="3">
+              <td>PJS-0231</td>
+              <td class="ttl"><span class="t">Night Cleaner — The Republic</span><span class="didi-src">✦ 3 candidates suggested by DiDi</span></td>
+              <td>07/28/2026</td><td>Night Cleaner</td><td>3128</td>
+              <td class="num">1</td><td class="num">0</td><td class="num">3</td>
+              <td><span class="chipstat open">Active</span></td><td class="qr">⬇︎ ↗</td>
+            </tr>
+            <tr class="closedrow" data-steps="4">
+              <td>PJS-0231</td>
+              <td class="ttl"><span class="t">Night Cleaner — The Republic</span><span class="didi-src">✦ Filled by DiDi workflow · time-to-fill 6 days</span></td>
+              <td>07/28/2026</td><td>Night Cleaner</td><td>3128</td>
+              <td class="num">1</td><td class="num">1</td><td class="num">3</td>
+              <td><span class="chipstat filled">Filled</span></td><td class="qr">⬇︎ ↗</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="drawer" data-steps="3">
+        <div class="lbl">✦ Suggested by DiDi · Night Cleaner — The Republic</div>
+        <div class="rank">Ranked on objective data only — distance to the job site, self-reported availability, desired pay, and application status. No subjective scoring.</div>
+        <div class="cand pick"><span class="av">MG</span><div class="ci"><span class="nm">Maria G</span><span class="why"><b>1.8 mi from site</b> · available M–F evenings · desired pay $16/hr · applied 07/21</span></div><span class="d">selected</span></div>
+        <div class="cand"><span class="av">JR</span><div class="ci"><span class="nm">Jose R</span><span class="why"><b>3.2 mi from site</b> · available M–F evenings · desired pay $16.50/hr · applied 07/14</span></div><span class="d">2nd</span></div>
+        <div class="cand"><span class="av">LT</span><div class="ci"><span class="nm">Luis T</span><span class="why"><b>4.5 mi from site</b> · available weeknights after 5p · desired pay $16/hr · screening complete</span></div><span class="d">3rd</span></div>
+      </div>
+
+      <div class="fillnote" data-steps="4">✓ Hiring Maria G into the posting consumed the opening — the posting closed itself and moved to Inactive. Openings, Hired, and time-to-fill tracked on the posting automatically.</div>
+
+      <div class="ffoot"><span data-steps="1">1–1 of 1</span><span data-steps="2 3">1–2 of 2</span><span data-steps="4">1–2 of 2</span></div>
+    </div>
+  </div>
+
+  <div class="navbtns">
+    <button class="btn" id="prev">← Back</button>
+    <button class="btn primary" id="next">Next →</button>
+  </div>
+
+  <footer>
+    Prepared by Findd · PJS Austin vacancy workflow · Manager → ✦ DiDi → Findd Job Posting → HR → Filled
+  </footer>
+</div>
+
+<script>
+  var cur = 1, TOTAL = 4;
+  var prevBtn = document.getElementById('prev');
+  var nextBtn = document.getElementById('next');
+
+  function render(){
+    document.querySelectorAll('[data-steps]').forEach(function(el){
+      var steps = el.getAttribute('data-steps').split(' ');
+      el.classList.toggle('on', steps.indexOf(String(cur)) !== -1);
+    });
+    document.querySelectorAll('.pill').forEach(function(p){
+      var n = parseInt(p.getAttribute('data-go'), 10);
+      p.classList.toggle('active', n === cur);
+      p.classList.toggle('past', n < cur);
+      p.setAttribute('aria-selected', n === cur ? 'true' : 'false');
+    });
+    prevBtn.disabled = (cur === 1);
+    nextBtn.disabled = (cur === TOTAL);
+    nextBtn.textContent = (cur === TOTAL) ? 'Done ✓' : 'Next →';
+  }
+
+  function go(n){ cur = Math.max(1, Math.min(TOTAL, n)); render(); }
+
+  document.querySelectorAll('.pill').forEach(function(p){
+    p.addEventListener('click', function(){ go(parseInt(p.getAttribute('data-go'), 10)); });
+  });
+  prevBtn.addEventListener('click', function(){ go(cur - 1); });
+  nextBtn.addEventListener('click', function(){ go(cur + 1); });
+  window.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight') go(cur + 1);
+    if (e.key === 'ArrowLeft') go(cur - 1);
+  });
+
+  render();
+</script>
